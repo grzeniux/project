@@ -1,3 +1,5 @@
 selenium
 python-dotenv
 requests
+pytest
+pytest-mock
