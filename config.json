@@ -1,0 +1,57 @@
+{
+    "settings": {
+        "scraping_interval_seconds": 900,
+        "selenium_hub_url": "http://selenium:4444/wd/hub",
+        "logs_dir": "logs",
+        "screenshots_dir": "logs"
+    },
+    "locators": {
+        "tradingview.com": {
+            "by": "CSS_SELECTOR",
+            "value": ".tv-symbol-price-quote__value"
+        }
+    },
+    "assets": {
+        "indices": {
+            "S&P 500": {
+                "url": "https://www.tradingview.com/symbols/SPX/"
+            },
+            "WIG 20": {
+                "url": "https://www.tradingview.com/symbols/GPW-WIG20/"
+            }
+        },
+        "stocks": {
+            "DINO": {
+                "url": "https://www.tradingview.com/symbols/GPW-DNP/"
+            }
+        },
+        "commodities": {
+            "Gold": {
+                "url": "https://www.tradingview.com/symbols/COMEX-GC1!/"
+            }
+        },
+        "crypto": {
+            "BTC/USDT": {
+                "url": "https://www.tradingview.com/symbols/BTCUSDT/"
+            },
+            "ETH/USDT": {
+                "url": "https://www.tradingview.com/symbols/ETHUSDT/"
+            }
+        },
+        "forex": {
+            "EUR/USD": {
+                "url": "https://www.tradingview.com/symbols/EURUSD/"
+            }
+        }
+    },
+    "alerts": {
+        "DINO": {
+            "above": 1000,
+            "below": 400
+        },
+        "BTC/USDT": {
+            "above": 75000,
+            "below": 65000
+        }
+    }
+}
