@@ -70,19 +70,24 @@ def test_e2e_in_process_application_run(mocker, local_http_server, capsys):
     # 3. Configure mock notifier and the loop-stopping mechanism
     mock_notifier_instance = MagicMock()
     mock_notifier_class.return_value = mock_notifier_instance
-    mock_sleep.side_effect = [KeyboardInterrupt] # Stop the loop after the first run
+
+    # This generator stops the main loop on the first call to time.sleep
+    # and allows subsequent calls that might occur during cleanup (e.g., in driver.quit()).
+    def sleep_generator():
+        yield KeyboardInterrupt
+        while True:
+            yield None
+
+    mock_sleep.side_effect = sleep_generator()
 
     # 4. Run the main application
     from main import main
-    try:
-        main()
-    except KeyboardInterrupt:
-        pass # Expected for stopping the loop
+    main()
 
     # 5. Assertions
     captured = capsys.readouterr()
-    # Check that the application logged the scraping result to stderr
-    assert "Cena dla TestAsset: 999.99" in captured.err
+    # Check that the application logged the scraping result to stdout
+    assert "Cena dla TestAsset: 999.99" in captured.out
     
     # Check that the price triggered an alert
     expected_alert_message = "🔔 ALERT for TestAsset 🔔\nPrice is BELOW 1000 at 999.99"
