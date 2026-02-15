@@ -17,14 +17,33 @@ def load_json(filename):
 def clean_price(price_str):
     """
     Cleans a price string by removing commas and other non-numeric characters,
-    then converts it to a float.
+    then converts it to a float. It can handle both '.' and ',' as decimal separators.
     """
     if price_str is None or price_str == "Error":
         return None
     
-    cleaned_str = ''.join(c for c in price_str if c.isdigit() or c == '.')
+    # Remove any non-digit, non-comma, non-period characters
+    price_str = ''.join(c for c in price_str if c.isdigit() or c in '.,')
+
+    # If both separators are present, determine which is decimal
+    if '.' in price_str and ',' in price_str:
+        if price_str.rfind(',') > price_str.rfind('.'):
+            # Format is "1.234,56" -> "1234.56"
+            price_str = price_str.replace('.', '').replace(',', '.')
+        else:
+            # Format is "1,234.56" -> "1234.56"
+            price_str = price_str.replace(',', '')
+    # If only one comma is present
+    elif ',' in price_str:
+        # If it's a thousands separator (e.g., "1,234" or "1,234,567")
+        if price_str.count(',') > 1 or (price_str.count(',') == 1 and len(price_str.split(',')[1]) == 3):
+             price_str = price_str.replace(',', '')
+        # Otherwise, it's a decimal separator
+        else:
+             price_str = price_str.replace(',', '.')
+
     try:
-        return float(cleaned_str)
+        return float(price_str)
     except (ValueError, TypeError):
         logging.error(f"Could not convert string to float: {price_str}")
         return None
