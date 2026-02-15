@@ -30,9 +30,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Run Pytest
+    - name: Create report directory
+      run: mkdir -p reports
+
+    - name: Run Pytest (Unit & Integration)
       run: |
-        python -m pytest -m "not e2e"
+        python -m pytest -m "not e2e" --html=reports/report-unit-integration.html --self-contained-html
 
     - name: Run E2E Tests
       run: |
@@ -40,4 +43,11 @@ jobs:
         # We also need to ensure the selenium hub is not used.
         # The 'local' setting in the test should handle this.
         sudo apt-get update && sudo apt-get install -y xvfb
-        xvfb-run python -m pytest -m "e2e"
+        xvfb-run python -m pytest -m "e2e" --html=reports/report-e2e.html --self-contained-html
+    
+    - name: Upload test reports
+      if: always() # Always run this step to upload reports even if tests fail
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: reports/
