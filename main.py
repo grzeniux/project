@@ -69,6 +69,7 @@ def main():
     """
     Main function to run the scraper periodically.
     """
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
     config = load_json('config.json')
     if not config:
         logging.critical("Could not load config.json. Application cannot start.")
@@ -123,5 +124,4 @@ def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     main()

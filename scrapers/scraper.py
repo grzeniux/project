@@ -22,19 +22,39 @@ class Scraper:
         self.driver = self._create_driver()
 
     def _create_driver(self):
-        """Creates and returns a remote WebDriver instance."""
+        """
+        Creates and returns a WebDriver instance.
+        If selenium_hub_url is "local", it creates a local Chrome driver.
+        Otherwise, it creates a remote WebDriver.
+        """
         try:
             options = webdriver.ChromeOptions()
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
-            driver = webdriver.Remote(
-                command_executor=self.selenium_hub_url,
-                options=options
-            )
+
+            if self.selenium_hub_url == "local":
+                # Use a local webdriver for E2E tests or local runs
+                from selenium.webdriver.chrome.service import Service as ChromeService
+                from webdriver_manager.chrome import ChromeDriverManager
+                
+                logging.info("Using local Chrome driver.")
+                service = ChromeService(ChromeDriverManager().install())
+                driver = webdriver.Chrome(service=service, options=options)
+            else:
+                # Use a remote webdriver for production (Docker) setup
+                logging.info(f"Connecting to remote WebDriver at {self.selenium_hub_url}")
+                driver = webdriver.Remote(
+                    command_executor=self.selenium_hub_url,
+                    options=options
+                )
             return driver
         except WebDriverException as e:
             logging.error(f"Failed to create WebDriver: {e}")
+            # This can happen if chromedriver is not found or grid is not available
+            return None
+        except Exception as e:
+            logging.error(f"An unexpected error occurred during WebDriver creation: {e}")
             return None
 
     def scrape(self, url: str, locator_info: dict) -> str:
